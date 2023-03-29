@@ -31,8 +31,8 @@ const editorModule = {
     removeNote(state, note) {
       state.notes = state.notes.filter(
         (n) =>
-          n.time !== note.time &&
-          n.note !== note.note &&
+          n.time !== note.time ||
+          n.note !== note.note ||
           n.duration !== note.duration
       );
     },
@@ -50,7 +50,6 @@ const editorModule = {
             state.parameters.grid
         ).toBarsBeatsSixteenths(),
       };
-      console.log(drawingNote);
       commit('setDrawingNote', drawingNote);
     },
     onEditorMouseDown({ commit, state }, lastClickedPos) {
@@ -64,7 +63,6 @@ const editorModule = {
             state.parameters.grid
         ).toBarsBeatsSixteenths(),
       };
-      console.log(drawingNote);
       commit('setDrawingNote', drawingNote);
     },
     saveNewNote({ commit }) {

@@ -52,7 +52,7 @@ export default {
   background-color: rgb(141, 187, 63);
   margin-top: -25px;
   border-radius: 16px;
-  box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.39);
 }
 .drawing-note {
   background-color: rgba(141, 187, 63, 0.62);
