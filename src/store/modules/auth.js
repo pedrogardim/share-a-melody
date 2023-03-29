@@ -1,7 +1,13 @@
-import axios from 'axios';
+import router from '../../router';
 
-const apiKey = process.env.VUE_APP_FB_API_KEY;
-const baseURL = process.env.VUE_APP_AUTH_API_BASE_URL;
+import { auth } from '@/js/firebase';
+
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+} from 'firebase/auth';
 
 const authModule = {
   state: () => ({ user: null }),
@@ -15,34 +21,27 @@ const authModule = {
     },
   },
   actions: {
-    logout({ commit }) {
-      commit('setUser', null);
-      localStorage.removeItem('user');
-    },
-    async signUp({ commit }, formData) {
-      const response = await axios.post(
-        `${baseURL}accounts:signUp?key=${apiKey}`,
-        { ...formData, returnSecureToken: true }
-      );
-      console.log(response);
-      commit('setUser', response.data);
-      localStorage.setItem('user', JSON.stringify(response.data));
-    },
-    async signIn({ commit }, formData) {
-      const response = await axios.post(
-        `${baseURL}accounts:signInWithPassword?key=${apiKey}`,
-        { ...formData, returnSecureToken: true }
-      );
-      commit('setUser', response.data);
-      localStorage.setItem('user', JSON.stringify(response.data));
-    },
-    async tryToLoginWithStoredToken({ commit }) {
-      const storedUser = JSON.parse(localStorage.getItem('user'));
-      const response = await axios.post(`${baseURL}token?key=${apiKey}`, {
-        storedUser,
+    authInit({ commit }) {
+      onAuthStateChanged(auth, (user) => {
+        console.log(user);
+        commit('setUser', user);
+        if (user) {
+          router.push('/');
+        }
       });
-      commit('setUser', response.data);
-      localStorage.setItem('user', JSON.stringify(response.data));
+    },
+    logout() {
+      signOut(auth);
+    },
+    async signUp(_, formData) {
+      await createUserWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password
+      );
+    },
+    async signIn(_, formData) {
+      await signInWithEmailAndPassword(auth, formData.email, formData.password);
     },
   },
 };
