@@ -9,7 +9,7 @@
     <router-link
       v-if="isUserLoggedIn"
       class="item"
-      to="/"
+      to="/editor"
     >
       Create melody
     </router-link>
@@ -27,6 +27,7 @@
     </div>
     <div
       v-else
+      @click="logout"
       class="right menu"
     >
       <a class="item">
@@ -40,19 +41,19 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 import { toSvg as generateIdenticon } from 'jdenticon';
 
 export default {
   name: 'AppHeader',
   computed: {
     generateAvatar() {
-      return generateIdenticon(this.getUser.localId, 40);
+      return generateIdenticon(this.getUser.uid, 40);
     },
     ...mapGetters(['getUser', 'isUserLoggedIn']),
   },
   methods: {
-    async login() {},
+    ...mapActions(['authInit', 'logout']),
   },
 };
 </script>

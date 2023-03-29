@@ -1,5 +1,6 @@
 import { createWebHistory, createRouter } from 'vue-router';
 import AuthForm from '../components/AuthForm.vue';
+import MelodyEditor from '../components/MelodyEditor.vue';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -7,6 +8,10 @@ const router = createRouter({
     {
       path: '/login',
       component: AuthForm,
+    },
+    {
+      path: '/editor',
+      component: MelodyEditor,
     },
   ],
 });
