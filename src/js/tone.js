@@ -27,6 +27,7 @@ Tone.Transport.loop = true;
 
 const reverbModule = new Tone.Reverb({ wet: 0.35 }).toDestination();
 
-export const FMSynth = new Tone.FMSynth(instrumentOptions).connect(
-  reverbModule
-);
+export const FMSynth = new Tone.PolySynth(
+  Tone.FMSynth,
+  instrumentOptions
+).connect(reverbModule);
