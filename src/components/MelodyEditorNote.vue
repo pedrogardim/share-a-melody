@@ -38,9 +38,11 @@ export default {
   },
   methods: {
     onNoteClick() {
-      this.removeNote(this.note);
+      console.log('this', this.note);
+
+      this.removeNote(this.note).then(this.scheduleMelody);
     },
-    ...mapActions(['removeNote']),
+    ...mapActions(['removeNote', 'scheduleMelody']),
   },
 };
 </script>

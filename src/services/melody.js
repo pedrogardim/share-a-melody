@@ -1,15 +1,11 @@
 import { FMSynth } from '@/js/tone';
 import * as Tone from 'tone';
 
-export const playMelody = (melody) => {
+export const playMelody = (melody, isEditor) => {
   Tone.start();
-  Tone.Transport.seconds = 0;
-  //Tone.Transport.setLoopPoints(0, '2:0:0');
   Tone.Transport.loop = false;
   Tone.Transport.cancel(0);
-  Tone.Transport.start();
 
-  console.log(melody.notes);
   melody.notes.map((note) => {
     let event = Tone.Transport.schedule((time) => {
       FMSynth.triggerAttackRelease(
@@ -20,4 +16,15 @@ export const playMelody = (melody) => {
     }, note.time);
     return event;
   });
+  if (isEditor) {
+    Tone.Transport.setLoopPoints(
+      ...[melody.loop[0], melody.loop[1] + 1].map(
+        (m) => m * Tone.Time('1m').toSeconds()
+      )
+    );
+    Tone.Transport.loop = true;
+    return;
+  }
+  Tone.Transport.seconds = 0;
+  Tone.Transport.start();
 };

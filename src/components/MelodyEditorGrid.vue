@@ -22,14 +22,12 @@
     >
       <span class="row-note-label">{{ getRowNote(row) }}</span>
       <div
-        v-for="col in (getParameters.measureRange[1] -
-          getParameters.measureRange[0] +
-          1) *
-        getParameters.grid"
+        v-for="col in getTotalColumns"
         :key="col"
         :class="`seq-tile ${
           (col - 1) % getParameters.grid === 0 ? 'accent-col' : ''
-        }`"
+        }
+        ${cursorPos === col - 1 && isPlaying ? 'cursor-col' : ''}`"
         @mouseenter="() => onTileHover(col - 1, row - 1)"
         @mousedown="() => onTileMouseDown(col - 1, row - 1)"
       >
@@ -47,19 +45,40 @@ import { FMSynth } from '@/js/tone';
 
 export default {
   name: 'MelodyEditorGrid',
-  watch: {
-    isMouseDown(isDown) {
-      if (!isDown) {
-        this.saveNewNote();
-      }
-    },
-  },
   data: () => ({
     isMouseDown: false,
     lastClickedPos: [0, 0],
+    cursorPos: 0,
+    columnInterval: null,
   }),
+  props: { isPlaying: { type: Boolean } },
+  watch: {
+    isMouseDown(isDown) {
+      if (!isDown) {
+        this.saveNewNote().then(this.scheduleMelody);
+      }
+    },
+  },
+
+  mounted() {
+    this.columnInterval = setInterval(() => {
+      let newPos = Math.floor(Tone.Transport.progress * this.getTotalColumns);
+      if (this.cursorPos !== newPos) this.cursorPos = newPos;
+    }, 17);
+  },
+  unmounted() {
+    clearInterval(this.columnInterval);
+  },
   computed: {
     ...mapGetters(['getParameters', 'getDrawingNote', 'getNotes']),
+    getTotalColumns() {
+      return (
+        (this.getParameters.measureRange[1] -
+          this.getParameters.measureRange[0] +
+          1) *
+        this.getParameters.grid
+      );
+    },
   },
   methods: {
     getRowNote(midiNote) {
@@ -87,8 +106,12 @@ export default {
         '8n'
       );
     },
-
-    ...mapActions(['onEditorDrag', 'onEditorMouseDown', 'saveNewNote']),
+    ...mapActions([
+      'onEditorDrag',
+      'onEditorMouseDown',
+      'saveNewNote',
+      'scheduleMelody',
+    ]),
   },
   components: { MelodyEditorNote },
 };
@@ -121,7 +144,7 @@ export default {
   width: 8px;
   border-radius: 16px;
   background-color: rgba(0, 0, 0, 0.32);
-  transition: all 0.3s;
+  transition: height width 0.3s;
 }
 
 .seq-tile:hover {
@@ -134,6 +157,9 @@ export default {
 }
 .accent-col {
   border-left: 1px solid rgb(40, 40, 40);
+}
+.cursor-col > div {
+  background-color: rgba(0, 0, 0, 0.5);
 }
 .row-note-label {
   position: absolute;

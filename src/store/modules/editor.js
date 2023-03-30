@@ -1,5 +1,7 @@
 import * as Tone from 'tone';
 
+import { playMelody } from '@/services/melody';
+
 const editorModule = {
   state: () => ({
     drawingNote: null,
@@ -70,6 +72,15 @@ const editorModule = {
     },
     removeNote({ commit }, note) {
       commit('removeNote', note);
+    },
+    scheduleMelody({ state }) {
+      playMelody(
+        {
+          notes: state.notes,
+          loop: state.parameters.measureRange,
+        },
+        true
+      );
     },
   },
 };

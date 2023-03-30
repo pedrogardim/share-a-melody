@@ -8,19 +8,43 @@
         />
       </div>
     </div>
-    <MelodyEditorGrid />
-    <button class="ui icon button">
-      <i class="play icon"></i>
+    <MelodyEditorGrid :isPlaying="isPlaying" />
+    <button
+      class="ui icon button"
+      @click="playStop"
+    >
+      <i :class="`${isPlaying ? 'stop' : 'play'} icon`"></i>
     </button>
   </div>
 </template>
 
 <script>
+import * as Tone from 'tone';
 import MelodyEditorGrid from './MelodyEditorGrid.vue';
 
 export default {
   name: 'MelodyEditor',
   components: { MelodyEditorGrid },
+  data: () => ({
+    isPlaying: false,
+  }),
+  methods: {
+    handleKeyEvents({ code }) {
+      if (code === 'Space') {
+        this.playStop();
+      }
+    },
+    playStop() {
+      Tone.Transport.toggle();
+      this.isPlaying = !this.isPlaying;
+    },
+  },
+  mounted() {
+    window.addEventListener('keydown', this.handleKeyEvents);
+  },
+  unmounted() {
+    window.removeEventListener('keydown', this.handleKeyEvents);
+  },
 };
 </script>
 
